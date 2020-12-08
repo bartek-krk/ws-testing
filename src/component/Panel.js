@@ -16,7 +16,9 @@ class Panel extends Component {
             "message":"",
             "syntax_ok":true,
             "error_msg":"",
-            "message_list":[]
+            "message_list":[],
+            "connection_errors":false,
+            "connected":false
         };
 
         this.wsEndpointChange = this.wsEndpointChange.bind(this);
@@ -62,10 +64,18 @@ class Panel extends Component {
                 _this.onMessageReceived(sdkEvent);
             });
         }, this.errorCallBack);
+
+        this.setState({
+            "connection_errors":false,
+            "connected":true
+        });
     }
 
     onDisonnect(event){
         this.stompClient.disconnect();
+        this.setState({
+            "connected":false
+        });
     }
 
     onMessageReceived(message){
@@ -80,7 +90,10 @@ class Panel extends Component {
     }
 
     errorCallBack() {
-        console.log("error occurrred");
+        this.setState({
+            "connection_errors":true,
+            "connected":false
+        });
     }
 
     messageChange(event){
@@ -118,17 +131,39 @@ class Panel extends Component {
     render() {
         return(
             <div className="panel">
+                <div className="app-status">
+                    {this.state.connected?<p>CONNECTED</p>:<p>NOT CONNECTED</p>}
+                    {this.state.connection_errors?<p>ERROR</p>:<p>NO ERRORS</p>}
+                </div>
                 <div className="connect-form">
                     <input placeholder="WS endpoint URL" onChange={this.wsEndpointChange}></input>
                     <input placeholder="Send to" onChange={this.sendToChange}></input>
                     <input placeholder="Fetch from" onChange={this.fetchFromChange}></input>
                     <button onClick={this.onConnect}>Connect</button>
-                    <button>Disconnect</button>
+                    <button onClick={this.onDisonnect}>Disconnect</button>
                 </div>
                 <div className="send-form">
                     <textarea id="message-box" placeholder="Message" onChange={this.messageChange}></textarea>
                     <button id="check-syntax-btn" onClick={this.onSyntaxDetails} disabled={this.state.syntax_ok}>{this.state.syntax_ok ? "Syntax OK" : "Syntax Error (details)"}</button>
                     <button onClick={this.onSend} disabled={!this.state.syntax_ok}>Send</button>
+                </div>
+                <div className="messages">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>Headers:</th>
+                                <th>Body:</th>
+                            </tr>
+                        </tbody>
+                        {this.state.message_list.map((d) => 
+                        <tbody>
+                            <tr>
+                                <td>{JSON.stringify(JSON.parse(d).headers)}</td>
+                                <td>{JSON.parse(d).body}</td>
+                            </tr>
+                        </tbody>
+                        )}
+                    </table>
                 </div>
             </div>
         );

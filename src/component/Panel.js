@@ -141,8 +141,8 @@ class Panel extends Component {
                     <input placeholder="WS endpoint URL" onChange={this.wsEndpointChange}></input>
                     <input placeholder="Send to" onChange={this.sendToChange}></input>
                     <input placeholder="Fetch from" onChange={this.fetchFromChange}></input>
-                    <button onClick={this.onConnect}>Connect</button>
-                    <button onClick={this.onDisonnect}>Disconnect</button>
+                    <button onClick={this.onConnect} disabled={this.state.connected}>Connect</button>
+                    <button onClick={this.onDisonnect} disabled={!this.state.connected}>Disconnect</button>
                 </div>
                 <div className="send-form">
                     <textarea id="message-box" placeholder="Message" onChange={this.messageChange}></textarea>

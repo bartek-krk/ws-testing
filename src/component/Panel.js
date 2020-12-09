@@ -1,7 +1,7 @@
 import { Component } from "react";
 import * as Stomp from 'stompjs';
 import * as SockJS from 'sockjs-client';
-
+import "./panel_styles.css";
 
 class Panel extends Component {
     constructor(props) {
@@ -72,10 +72,12 @@ class Panel extends Component {
     }
 
     onDisonnect(event){
-        this.stompClient.disconnect();
-        this.setState({
-            "connected":false
-        });
+        if(this.stompClient.connected){
+            this.stompClient.disconnect();
+            this.setState({
+              "connected":false
+            });
+        }
     }
 
     onMessageReceived(message){
@@ -132,8 +134,8 @@ class Panel extends Component {
         return(
             <div className="panel">
                 <div className="app-status">
-                    {this.state.connected?<p>CONNECTED</p>:<p>NOT CONNECTED</p>}
-                    {this.state.connection_errors?<p>ERROR</p>:<p>NO ERRORS</p>}
+                    {this.state.connected?<p className="connected-status">CONNECTED</p>:<p className="not-connected-status">NOT CONNECTED</p>}
+                    {this.state.connection_errors?<p className="error-status">ERROR</p>:<p className="no-errors-status">NO ERRORS</p>}
                 </div>
                 <div className="connect-form">
                     <input placeholder="WS endpoint URL" onChange={this.wsEndpointChange}></input>
